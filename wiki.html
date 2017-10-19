@@ -1,0 +1,73 @@
+<!DOCTYPE html>
+<html>
+<head>
+	<meta name="viewport" content="width=device-width, initial-scale=1.0">
+	<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/twitter-bootstrap/4.0.0-beta/css/bootstrap.min.css"/>	
+	<link rel="stylesheet" href="wiki.css">
+	<title>Wiki Search</title>
+</head>
+<body>
+	<div class="container">
+		<div>
+			<h1 id="head">Search Wikipedia</h1>
+		</div>
+		<div class="form-group">
+	      <input type="text" class="form-control" placeholder="Search">
+	    </div>		
+		<div class="searchResults">      
+		</div>
+	</div>
+
+<script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.2.1/jquery.min.js"></script>
+<script type="text/javascript">
+	
+	$(document).ready(function(){
+	  $("body").css("margin","20%");
+	  $(".form-control").keyup(function(event){
+	    if(event.keyCode == 13){
+	        searchWiki($(".form-control").val());
+	     }
+	  });
+	});
+
+	function searchWiki(search){
+	  var ulDel = document.getElementById("results");
+	  if(ulDel){	  	
+	    $("#results").remove();
+	  }
+	  var weblink = "https://en.wikipedia.org/w/api.php?action=query&format=json&list=search&srsearch="+search;
+	  var link = "https://en.wikipedia.org/?curid=";
+	  $.ajax({
+	    url:        weblink,
+	    dataType:   "jsonp",
+	    success:    function(data){
+	      var parsed = JSON.parse(JSON.stringify(data));
+	      var arr = parsed.query.search;
+	      var ul = document.createElement("ul");
+	      ul.setAttribute("id","results");
+	      for(var i = 0; i < arr.length; i++){
+	        var a = document.createElement("a");
+	        var li = document.createElement("li");
+	        var h3 = document.createElement("h3");
+	        var p = document.createElement("p");  
+	        var id = arr[i].pageid;
+	        a.setAttribute("href",link+id);
+	        a.setAttribute("id","link");
+	        li.setAttribute("id", id);
+	        h3.innerHTML = arr[i].title;
+	        p.innerHTML = arr[i].snippet;
+	        li.append(h3);
+	        li.append(p);
+	        a.append(li)
+	        ul.append(a);        
+	      }
+	      $(".searchResults").append(ul);
+
+	      $("body").css("margin","5%");
+	    }
+	   });  
+	  }
+
+</script>
+</body>
+</html>
